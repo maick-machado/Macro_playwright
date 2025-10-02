@@ -129,7 +129,7 @@ async def main():
                 # -----------------------------------------------------
                 # ABRINDO O MENU PARA ACESSAR "RETENÇÃO DE CONTRIBUIÇÃO PREVIDENCIÁRIA TOMADORES DE SERVIÇOS (R2010)"
                 print("Localizando o iframe com id='frmApp'...")
-                frame_locator = frame_locator.frame_locator("#frmApp")
+                frame_locator = page.frame_locator("#frmApp")
                 print("Iframe localizado com sucesso!")
                 testid_menu_principal = (
                     "menu_retencoes_previdenciarias_series_r2000_e_r3000"
@@ -170,7 +170,15 @@ async def main():
                 print("Campo 'Período de Apuração' preenchido com sucesso!")
                 # -----------------------------------------------------
                 # CAMPO CNPJ PRF
-                cnpj_a_preencher = "99.999.999/9999-99"
+                testid_do_select = "tipo_inscricao_estabelecimento"
+                select_locator = frame_locator.locator(
+                    f'[data-testid="{testid_do_select}"]'
+                )
+                valor_da_opcao = "1"
+                await select_locator.select_option(value=valor_da_opcao)
+                print("Opção selecionada com sucesso!")
+
+                cnpj_a_preencher = "00394494013700"
                 testid_do_campo = "numero_inscricao_cnpj"
                 campo_cnpj = frame_locator.locator(f'[data-testid="{testid_do_campo}"]')
                 await campo_cnpj.fill(cnpj_a_preencher)
@@ -226,12 +234,12 @@ async def main():
                 valor_numero_doc = num_nf_principal
                 valor_data_emissao = data_emissao_nf
                 valor_bruto = valor_bruto_nf
-                await frame_locator.locator('[data-testid="serie"]').fill(valor_serie)
+                await frame_locator.locator('[data-testid="serie"]').fill(str(valor_serie))
                 await frame_locator.locator('[data-testid="numero_documento"]').fill(
-                    valor_numero_doc
+                    str(valor_numero_doc)
                 )
                 await frame_locator.locator('[data-testid="data_emissao_nf"]').fill(
-                    valor_data_emissao
+                    str(valor_data_emissao)
                 )
                 await frame_locator.locator('[data-testid="valor_bruto"]').fill(
                     valor_bruto
@@ -242,26 +250,25 @@ async def main():
                     f'[data-testid="{testid_do_botao_salvar}"]'
                 )
                 await botao_salvar.click()
-                await frame_locator.wait_for_load_state("networkidle")
+                #await page.wait_for_load_state("networkidle")
                 print("Dados salvos com sucesso e a página foi atualizada!")
                 # -----------------------------------------------------
                 # CLICANDO EM INCLUIR NOVO TIPO DE SERVIÇO
-                texto_da_secao = "Tipos de serviço"
-                container_tipos_servico = page.locator(
-                    f'*:has-text("{texto_da_secao}")'
+                #time.sleep(3)
+                testid_do_link_tipo_servico = "botao_inclusao_info_tp_serv_0"
+                link_incluir_novo_tipo_servico = frame_locator.get_by_test_id(
+                    testid_do_link_tipo_servico
                 )
-                link_incluir_novo_servico = container_tipos_servico.get_by_text(
-                    "[Incluir Novo]"
-                )
-                await link_incluir_novo_servico.click()
+                await link_incluir_novo_tipo_servico.click()
                 print(
-                    "Link '[Incluir Novo]' da seção 'Tipos de serviço' clicado com sucesso!"
+                    "Link '[Incluir Novo]' da seção 'Serviços tomados' clicado com sucesso!"
                 )
+                #await page.wait_for_load_state("networkidle")
                 # -----------------------------------------------------
                 # PREENCHENDO DADOS DO TIPO DE SERVIÇO
                 valor_padrao_servico = "100000002"
                 testid_do_select = "tipo_servico"
-                select_locator = page.locator(f'[data-testid="{testid_do_select}"]')
+                select_locator = frame_locator.locator(f'[data-testid="{testid_do_select}"]')
                 await select_locator.select_option(value=valor_padrao_servico)
                 print("Campo 'Tipo de Serviço' selecionado com sucesso!")
                 print(
@@ -270,22 +277,22 @@ async def main():
                 valor_base = valor_bruto_nf
                 valor_retido = valor_retencao_nf
                 testid_base = "valor_base_ret"
-                campo_base_ret = page.locator(f'[data-testid="{testid_base}"]')
+                campo_base_ret = frame_locator.locator(f'[data-testid="{testid_base}"]')
                 await campo_base_ret.fill(valor_base)
                 testid_retencao = "valor_retencao"
-                campo_retencao = page.locator(f'[data-testid="{testid_retencao}"]')
+                campo_retencao = frame_locator.locator(f'[data-testid="{testid_retencao}"]')
                 await campo_retencao.fill(valor_retido)
                 print("\nCampos de valores preenchidos com sucesso!")
                 # -----------------------------------------------------
                 # SALVANDO O FORMULÁRIO DO TIPO DE SERVIÇO
                 testid_botao = "botao_salvar_info_tpserv"
-                botao_salvar_servico = page.locator(f'[data-testid="{testid_botao}"]')
+                botao_salvar_servico = frame_locator.locator(f'[data-testid="{testid_botao}"]')
                 await botao_salvar_servico.click()
                 print("Botão 'Salvar' do serviço foi clicado.")
                 # -----------------------------------------------------
                 # SALVANDO COMO RASCUNHO
                 testid_salvar_rascunho = "botao_salvar_rascunho"
-                botao_salvar_rascunho = page.locator(
+                botao_salvar_rascunho = frame_locator.locator(
                     f'[data-testid="{testid_salvar_rascunho}"]'
                 )
                 await botao_salvar_rascunho.click()
